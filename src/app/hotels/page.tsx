@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -10,113 +10,119 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Star, MapPin, Wifi, UtensilsCrossed, Waves, Dumbbell } from "lucide-react"
+import { Star, MapPin, Loader2 } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
+import { toast } from "sonner"
 
-const mockHotels = [
-  {
-    id: 1,
-    name: "Grand Plaza Hotel",
-    location: "New York, USA",
-    rating: 4.8,
-    reviews: 1284,
-    price: 299,
-    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
-    amenities: ["Free WiFi", "Pool", "Spa", "Restaurant"],
-    roomType: "Deluxe Suite"
-  },
-  {
-    id: 2,
-    name: "Seaside Resort",
-    location: "Miami, USA",
-    rating: 4.9,
-    reviews: 892,
-    price: 399,
-    image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=600&fit=crop",
-    amenities: ["Beach Access", "Restaurant", "Gym", "Free WiFi"],
-    roomType: "Ocean View"
-  },
-  {
-    id: 3,
-    name: "Mountain View Lodge",
-    location: "Colorado, USA",
-    rating: 4.7,
-    reviews: 654,
-    price: 249,
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=600&fit=crop",
-    amenities: ["Mountain View", "Fireplace", "Hiking", "Free WiFi"],
-    roomType: "Standard Room"
-  },
-  {
-    id: 4,
-    name: "City Center Inn",
-    location: "Chicago, USA",
-    rating: 4.5,
-    reviews: 432,
-    price: 199,
-    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop",
-    amenities: ["Free WiFi", "Breakfast", "Parking"],
-    roomType: "Standard Room"
-  },
-  {
-    id: 5,
-    name: "Luxury Palace Hotel",
-    location: "Las Vegas, USA",
-    rating: 4.9,
-    reviews: 2156,
-    price: 499,
-    image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=600&fit=crop",
-    amenities: ["Casino", "Pool", "Spa", "Restaurant", "Free WiFi", "Gym"],
-    roomType: "Presidential Suite"
-  },
-  {
-    id: 6,
-    name: "Beachfront Paradise",
-    location: "California, USA",
-    rating: 4.6,
-    reviews: 765,
-    price: 349,
-    image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop",
-    amenities: ["Beach Access", "Pool", "Restaurant", "Free WiFi"],
-    roomType: "Deluxe Suite"
-  },
-  {
-    id: 7,
-    name: "Historic Downtown Hotel",
-    location: "Boston, USA",
-    rating: 4.4,
-    reviews: 543,
-    price: 229,
-    image: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop",
-    amenities: ["Free WiFi", "Breakfast", "Historic Building"],
-    roomType: "Standard Room"
-  },
-  {
-    id: 8,
-    name: "Lakeside Resort",
-    location: "Minnesota, USA",
-    rating: 4.7,
-    reviews: 421,
-    price: 279,
-    image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop",
-    amenities: ["Lake View", "Restaurant", "Spa", "Free WiFi"],
-    roomType: "Lake View Room"
-  }
-]
+interface Hotel {
+  id: number
+  name: string
+  location: string
+  address: string
+  rating: number
+  reviews: number
+  price: number
+  images: string[]
+  amenities: string[]
+  roomType: string
+  description: string
+  createdAt: string
+}
 
 export default function HotelsPage() {
   const [priceRange, setPriceRange] = useState([0, 500])
   const [selectedRating, setSelectedRating] = useState<string>("all")
   const [sortBy, setSortBy] = useState<string>("recommended")
-  const [filteredHotels, setFilteredHotels] = useState(mockHotels)
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
+  const [selectedRoomTypes, setSelectedRoomTypes] = useState<string[]>([])
+  const [hotels, setHotels] = useState<Hotel[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   const amenitiesFilter = [
-    { id: "wifi", label: "Free WiFi", icon: Wifi },
-    { id: "pool", label: "Pool", icon: Waves },
-    { id: "gym", label: "Gym", icon: Dumbbell },
-    { id: "restaurant", label: "Restaurant", icon: UtensilsCrossed }
+    { id: "wifi", label: "Free WiFi" },
+    { id: "pool", label: "Pool" },
+    { id: "gym", label: "Gym" },
+    { id: "restaurant", label: "Restaurant" }
   ]
+
+  const roomTypeFilters = [
+    { id: "standard", label: "Standard Room" },
+    { id: "deluxe", label: "Deluxe Suite" },
+    { id: "presidential", label: "Presidential Suite" }
+  ]
+
+  // Fetch hotels from API
+  useEffect(() => {
+    fetchHotels()
+  }, [priceRange, selectedRating, sortBy, selectedAmenities])
+
+  const fetchHotels = async () => {
+    setIsLoading(true)
+    setError(null)
+    
+    try {
+      const params = new URLSearchParams()
+      params.append("minPrice", priceRange[0].toString())
+      params.append("maxPrice", priceRange[1].toString())
+      
+      if (selectedRating !== "all") {
+        params.append("minRating", selectedRating)
+      }
+      
+      if (sortBy) {
+        params.append("sortBy", sortBy)
+      }
+      
+      if (selectedAmenities.length > 0) {
+        params.append("amenities", selectedAmenities.join(","))
+      }
+
+      const response = await fetch(`/api/hotels?${params.toString()}`)
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch hotels")
+      }
+      
+      const data = await response.json()
+      setHotels(data)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+      toast.error("Failed to load hotels")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleAmenityToggle = (amenity: string) => {
+    setSelectedAmenities(prev => 
+      prev.includes(amenity)
+        ? prev.filter(a => a !== amenity)
+        : [...prev, amenity]
+    )
+  }
+
+  const handleRoomTypeToggle = (roomType: string) => {
+    setSelectedRoomTypes(prev => 
+      prev.includes(roomType)
+        ? prev.filter(r => r !== roomType)
+        : [...prev, roomType]
+    )
+  }
+
+  const handleResetFilters = () => {
+    setPriceRange([0, 500])
+    setSelectedRating("all")
+    setSortBy("recommended")
+    setSelectedAmenities([])
+    setSelectedRoomTypes([])
+  }
+
+  // Filter by room type client-side
+  const filteredHotels = selectedRoomTypes.length > 0
+    ? hotels.filter(hotel => selectedRoomTypes.includes(hotel.roomType))
+    : hotels
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -179,7 +185,11 @@ export default function HotelsPage() {
                   <div className="space-y-2">
                     {amenitiesFilter.map((amenity) => (
                       <div key={amenity.id} className="flex items-center space-x-2">
-                        <Checkbox id={amenity.id} />
+                        <Checkbox 
+                          id={amenity.id}
+                          checked={selectedAmenities.includes(amenity.label)}
+                          onCheckedChange={() => handleAmenityToggle(amenity.label)}
+                        />
                         <label
                           htmlFor={amenity.id}
                           className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
@@ -195,28 +205,22 @@ export default function HotelsPage() {
                 <div className="space-y-3">
                   <Label>Room Type</Label>
                   <div className="space-y-2">
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="standard" />
-                      <label htmlFor="standard" className="text-sm font-medium cursor-pointer">
-                        Standard Room
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="deluxe" />
-                      <label htmlFor="deluxe" className="text-sm font-medium cursor-pointer">
-                        Deluxe Suite
-                      </label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="presidential" />
-                      <label htmlFor="presidential" className="text-sm font-medium cursor-pointer">
-                        Presidential Suite
-                      </label>
-                    </div>
+                    {roomTypeFilters.map((roomType) => (
+                      <div key={roomType.id} className="flex items-center space-x-2">
+                        <Checkbox 
+                          id={roomType.id}
+                          checked={selectedRoomTypes.includes(roomType.label)}
+                          onCheckedChange={() => handleRoomTypeToggle(roomType.label)}
+                        />
+                        <label htmlFor={roomType.id} className="text-sm font-medium cursor-pointer">
+                          {roomType.label}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <Button className="w-full" variant="outline">
+                <Button className="w-full" variant="outline" onClick={handleResetFilters}>
                   Reset Filters
                 </Button>
               </CardContent>
@@ -243,66 +247,91 @@ export default function HotelsPage() {
               </Select>
             </div>
 
+            {/* Loading State */}
+            {isLoading && (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !isLoading && (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground mb-4">{error}</p>
+                <Button onClick={fetchHotels}>Try Again</Button>
+              </Card>
+            )}
+
+            {/* Empty State */}
+            {!isLoading && !error && filteredHotels.length === 0 && (
+              <Card className="p-8 text-center">
+                <p className="text-muted-foreground mb-4">No hotels found matching your criteria</p>
+                <Button variant="outline" onClick={handleResetFilters}>Reset Filters</Button>
+              </Card>
+            )}
+
             {/* Hotel Cards */}
-            <div className="space-y-4">
-              {filteredHotels.map((hotel) => (
-                <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="grid md:grid-cols-[300px_1fr] gap-0">
-                    <div className="relative h-64 md:h-full">
-                      <Image
-                        src={hotel.image}
-                        alt={hotel.name}
-                        fill
-                        className="object-cover"
-                      />
-                    </div>
-                    <div className="flex flex-col">
-                      <CardHeader>
-                        <div className="flex items-start justify-between">
+            {!isLoading && !error && filteredHotels.length > 0 && (
+              <div className="space-y-4">
+                {filteredHotels.map((hotel) => (
+                  <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                    <div className="grid md:grid-cols-[300px_1fr] gap-0">
+                      <div className="relative h-64 md:h-full">
+                        <Image
+                          src={hotel.images[0] || "/placeholder.jpg"}
+                          alt={hotel.name}
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="flex flex-col">
+                        <CardHeader>
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <CardTitle className="text-xl mb-2">{hotel.name}</CardTitle>
+                              <CardDescription className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                {hotel.location}
+                              </CardDescription>
+                            </div>
+                            <Badge variant="secondary" className="flex items-center gap-1">
+                              <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                              {hotel.rating}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="flex-1">
+                          <div className="space-y-3">
+                            <p className="text-sm text-muted-foreground">
+                              {hotel.reviews} reviews • {hotel.roomType}
+                            </p>
+                            <div className="flex flex-wrap gap-2">
+                              {hotel.amenities.slice(0, 4).map((amenity) => (
+                                <Badge key={amenity} variant="outline" className="text-xs">
+                                  {amenity}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        </CardContent>
+                        <CardFooter className="flex items-center justify-between border-t pt-4">
                           <div>
-                            <CardTitle className="text-xl mb-2">{hotel.name}</CardTitle>
-                            <CardDescription className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {hotel.location}
-                            </CardDescription>
+                            <p className="text-sm text-muted-foreground">Starting from</p>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-3xl font-bold">${hotel.price}</span>
+                              <span className="text-muted-foreground text-sm">/night</span>
+                            </div>
                           </div>
-                          <Badge variant="secondary" className="flex items-center gap-1">
-                            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-                            {hotel.rating}
-                          </Badge>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="flex-1">
-                        <div className="space-y-3">
-                          <p className="text-sm text-muted-foreground">
-                            {hotel.reviews} reviews • {hotel.roomType}
-                          </p>
-                          <div className="flex flex-wrap gap-2">
-                            {hotel.amenities.map((amenity) => (
-                              <Badge key={amenity} variant="outline" className="text-xs">
-                                {amenity}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex items-center justify-between border-t pt-4">
-                        <div>
-                          <p className="text-sm text-muted-foreground">Starting from</p>
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-3xl font-bold">${hotel.price}</span>
-                            <span className="text-muted-foreground text-sm">/night</span>
-                          </div>
-                        </div>
-                        <Button size="lg" asChild>
-                          <Link href={`/hotels/${hotel.id}`}>View Details</Link>
-                        </Button>
-                      </CardFooter>
+                          <Button size="lg" asChild>
+                            <Link href={`/hotels/${hotel.id}`}>View Details</Link>
+                          </Button>
+                        </CardFooter>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

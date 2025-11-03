@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Navbar from "@/components/Navbar"
 import Footer from "@/components/Footer"
@@ -13,35 +13,33 @@ import { Textarea } from "@/components/ui/textarea"
 import { Calendar } from "@/components/ui/calendar"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Separator } from "@/components/ui/separator"
-import { Star, MapPin, Wifi, Waves, Dumbbell, UtensilsCrossed, CalendarIcon, Users, Phone, Mail } from "lucide-react"
+import { Star, MapPin, CalendarIcon, Users, Phone, Mail, Loader2 } from "lucide-react"
 import Image from "next/image"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
-const mockHotelData: Record<string, any> = {
-  "1": {
-    id: 1,
-    name: "Grand Plaza Hotel",
-    location: "New York, USA",
-    address: "123 Fifth Avenue, New York, NY 10001",
-    rating: 4.8,
-    reviews: 1284,
-    price: 299,
-    images: [
-      "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop",
-      "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&h=600&fit=crop"
-    ],
-    amenities: ["Free WiFi", "Pool", "Spa", "Restaurant", "Gym", "Room Service"],
-    roomType: "Deluxe Suite",
-    description: "Experience luxury at its finest in our Grand Plaza Hotel. Located in the heart of New York City, our hotel offers stunning views and world-class amenities."
-  }
+interface Hotel {
+  id: number
+  name: string
+  location: string
+  address: string
+  rating: number
+  reviews: number
+  price: number
+  images: string[]
+  amenities: string[]
+  roomType: string
+  description: string
+  createdAt: string
 }
 
 export default function HotelDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const hotel = mockHotelData[params.id as string] || mockHotelData["1"]
+  const [hotel, setHotel] = useState<Hotel | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [isBooking, setIsBooking] = useState(false)
   
   const [checkIn, setCheckIn] = useState<Date>()
   const [checkOut, setCheckOut] = useState<Date>()
@@ -52,6 +50,32 @@ export default function HotelDetailPage() {
   const [specialRequests, setSpecialRequests] = useState("")
   const [showPayment, setShowPayment] = useState(false)
 
+  // Fetch hotel details
+  useEffect(() => {
+    if (params.id) {
+      fetchHotel()
+    }
+  }, [params.id])
+
+  const fetchHotel = async () => {
+    setIsLoading(true)
+    try {
+      const response = await fetch(`/api/hotels/${params.id}`)
+      
+      if (!response.ok) {
+        throw new Error("Hotel not found")
+      }
+      
+      const data = await response.json()
+      setHotel(data)
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to load hotel")
+      router.push("/hotels")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   const calculateNights = () => {
     if (checkIn && checkOut) {
       const diff = checkOut.getTime() - checkIn.getTime()
@@ -61,22 +85,82 @@ export default function HotelDetailPage() {
   }
 
   const nights = calculateNights()
-  const subtotal = hotel.price * nights
+  const subtotal = hotel ? hotel.price * nights : 0
   const taxes = subtotal * 0.1
   const total = subtotal + taxes
 
   const handleBooking = () => {
     if (!checkIn || !checkOut || !fullName || !email || !phone) {
-      alert("Please fill in all required fields")
+      toast.error("Please fill in all required fields")
       return
     }
+    
+    if (!guests || parseInt(guests) < 1) {
+      toast.error("Please enter a valid number of guests")
+      return
+    }
+    
     setShowPayment(true)
   }
 
-  const handlePayment = () => {
-    // Mock payment processing
-    alert("Booking confirmed! Check your email for confirmation details.")
-    router.push("/profile/bookings")
+  const handlePayment = async () => {
+    if (!hotel) return
+    
+    setIsBooking(true)
+    
+    try {
+      const bookingData = {
+        hotel_id: hotel.id,
+        check_in: checkIn!.toISOString(),
+        check_out: checkOut!.toISOString(),
+        guests: parseInt(guests),
+        full_name: fullName,
+        email: email,
+        phone: phone,
+        special_requests: specialRequests || null,
+        subtotal: subtotal,
+        taxes: taxes,
+        total_price: total,
+        status: "confirmed"
+      }
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(bookingData)
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || "Failed to create booking")
+      }
+
+      const booking = await response.json()
+      toast.success("Booking confirmed! Check your email for confirmation details.")
+      router.push("/profile/bookings")
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to create booking")
+    } finally {
+      setIsBooking(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Navbar />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        </div>
+        <Footer />
+      </div>
+    )
+  }
+
+  if (!hotel) {
+    return null
   }
 
   return (
@@ -291,8 +375,20 @@ export default function HotelDetailPage() {
                     Proceed to Payment
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full" onClick={handlePayment}>
-                    Confirm Booking
+                  <Button 
+                    size="lg" 
+                    className="w-full" 
+                    onClick={handlePayment}
+                    disabled={isBooking}
+                  >
+                    {isBooking ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      "Confirm Booking"
+                    )}
                   </Button>
                 )}
               </CardFooter>
