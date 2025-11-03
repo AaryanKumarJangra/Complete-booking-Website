@@ -18,7 +18,20 @@ export async function GET(request: NextRequest) {
     const results = await query;
 
     const formattedResults = results.map(row => ({
-      ...row.bookings,
+      id: row.bookings.id,
+      hotelId: row.bookings.hotelId,
+      checkIn: row.bookings.checkIn,
+      checkOut: row.bookings.checkOut,
+      guests: row.bookings.guests,
+      fullName: row.bookings.fullName,
+      email: row.bookings.email,
+      phone: row.bookings.phone,
+      specialRequests: row.bookings.specialRequests,
+      status: row.bookings.status,
+      subtotal: row.bookings.subtotal,
+      taxes: row.bookings.taxes,
+      totalPrice: row.bookings.totalPrice,
+      createdAt: row.bookings.createdAt,
       hotel: row.hotels
     }));
 
