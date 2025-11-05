@@ -14,7 +14,7 @@ const featuredHotels = [
     location: "New York, USA",
     rating: 4.8,
     reviews: 1284,
-    price: 299,
+    price: 24999,
     image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
     amenities: ["Free WiFi", "Pool", "Spa"]
   },
@@ -24,7 +24,7 @@ const featuredHotels = [
     location: "Miami, USA",
     rating: 4.9,
     reviews: 892,
-    price: 399,
+    price: 33499,
     image: "https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&h=600&fit=crop",
     amenities: ["Beach Access", "Restaurant", "Gym"]
   },
@@ -34,7 +34,7 @@ const featuredHotels = [
     location: "Colorado, USA",
     rating: 4.7,
     reviews: 654,
-    price: 249,
+    price: 20999,
     image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&h=600&fit=crop",
     amenities: ["Mountain View", "Fireplace", "Hiking"]
   }
@@ -47,7 +47,7 @@ const featuredFlights = [
     from: "New York (JFK)",
     to: "London (LHR)",
     duration: "7h 30m",
-    price: 599,
+    price: 49999,
     class: "Economy"
   },
   {
@@ -56,7 +56,7 @@ const featuredFlights = [
     from: "Los Angeles (LAX)",
     to: "Tokyo (NRT)",
     duration: "11h 45m",
-    price: 899,
+    price: 74999,
     class: "Business"
   },
   {
@@ -65,7 +65,7 @@ const featuredFlights = [
     from: "Paris (CDG)",
     to: "Barcelona (BCN)",
     duration: "2h 15m",
-    price: 149,
+    price: 12499,
     class: "Economy"
   }
 ]
@@ -76,7 +76,7 @@ const featuredTaxis = [
     type: "Sedan",
     model: "Toyota Camry",
     capacity: "4 Passengers",
-    pricePerKm: 2.5,
+    pricePerKm: 18,
     features: ["AC", "GPS", "Music System"]
   },
   {
@@ -84,7 +84,7 @@ const featuredTaxis = [
     type: "SUV",
     model: "Honda CR-V",
     capacity: "6 Passengers",
-    pricePerKm: 3.5,
+    pricePerKm: 25,
     features: ["AC", "GPS", "Extra Luggage Space"]
   },
   {
@@ -92,7 +92,7 @@ const featuredTaxis = [
     type: "Luxury",
     model: "Mercedes S-Class",
     capacity: "4 Passengers",
-    pricePerKm: 5.5,
+    pricePerKm: 45,
     features: ["Premium AC", "GPS", "Leather Seats", "WiFi"]
   }
 ]
@@ -113,7 +113,7 @@ export default function FeaturedServices() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {featuredHotels.map((hotel) => (
-            <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <Card key={hotel.id} className="overflow-hidden card-hover-effect">
               <div className="relative h-48 w-full">
                 <Image
                   src={hotel.image}
@@ -151,10 +151,10 @@ export default function FeaturedServices() {
               </CardContent>
               <CardFooter className="flex items-center justify-between">
                 <div>
-                  <span className="text-2xl font-bold">${hotel.price}</span>
+                  <span className="text-2xl font-bold">₹{hotel.price.toLocaleString('en-IN')}</span>
                   <span className="text-muted-foreground text-sm">/night</span>
                 </div>
-                <Button asChild>
+                <Button asChild className="btn-primary-enhanced">
                   <Link href={`/hotels/${hotel.id}`}>Book Now</Link>
                 </Button>
               </CardFooter>
@@ -176,7 +176,7 @@ export default function FeaturedServices() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {featuredFlights.map((flight) => (
-            <Card key={flight.id} className="hover:shadow-lg transition-shadow">
+            <Card key={flight.id} className="card-hover-effect">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Plane className="h-5 w-5" />
@@ -200,10 +200,10 @@ export default function FeaturedServices() {
               </CardContent>
               <CardFooter className="flex items-center justify-between">
                 <div>
-                  <span className="text-2xl font-bold">${flight.price}</span>
+                  <span className="text-2xl font-bold">₹{flight.price.toLocaleString('en-IN')}</span>
                   <span className="text-muted-foreground text-sm">/person</span>
                 </div>
-                <Button asChild>
+                <Button asChild className="btn-primary-enhanced">
                   <Link href={`/flights/${flight.id}`}>Book Flight</Link>
                 </Button>
               </CardFooter>
@@ -225,7 +225,7 @@ export default function FeaturedServices() {
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {featuredTaxis.map((taxi) => (
-            <Card key={taxi.id} className="hover:shadow-lg transition-shadow">
+            <Card key={taxi.id} className="card-hover-effect">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div>
@@ -249,10 +249,10 @@ export default function FeaturedServices() {
               </CardContent>
               <CardFooter className="flex items-center justify-between">
                 <div>
-                  <span className="text-2xl font-bold">${taxi.pricePerKm}</span>
+                  <span className="text-2xl font-bold">₹{taxi.pricePerKm}</span>
                   <span className="text-muted-foreground text-sm">/km</span>
                 </div>
-                <Button asChild>
+                <Button asChild className="btn-primary-enhanced">
                   <Link href={`/taxis/${taxi.id}`}>Book Ride</Link>
                 </Button>
               </CardFooter>
