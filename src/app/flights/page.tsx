@@ -24,7 +24,7 @@ const mockFlights = [
     arrival: "08:30 PM",
     duration: "7h 30m",
     stops: "Non-stop",
-    price: 599,
+    price: 49999,
     class: "Economy",
     date: "2024-02-15"
   },
@@ -38,7 +38,7 @@ const mockFlights = [
     arrival: "05:45 PM+1",
     duration: "11h 45m",
     stops: "Non-stop",
-    price: 899,
+    price: 74999,
     class: "Business",
     date: "2024-02-15"
   },
@@ -52,7 +52,7 @@ const mockFlights = [
     arrival: "04:15 PM",
     duration: "2h 15m",
     stops: "Non-stop",
-    price: 149,
+    price: 12499,
     class: "Economy",
     date: "2024-02-15"
   },
@@ -66,7 +66,7 @@ const mockFlights = [
     arrival: "02:45 PM",
     duration: "7h 15m",
     stops: "Non-stop",
-    price: 749,
+    price: 62499,
     class: "Business",
     date: "2024-02-16"
   },
@@ -80,7 +80,7 @@ const mockFlights = [
     arrival: "11:30 AM",
     duration: "3h 45m",
     stops: "1 Stop",
-    price: 199,
+    price: 16499,
     class: "Economy",
     date: "2024-02-15"
   },
@@ -94,7 +94,7 @@ const mockFlights = [
     arrival: "05:30 PM",
     duration: "12h 30m",
     stops: "Non-stop",
-    price: 1099,
+    price: 91499,
     class: "Premium Economy",
     date: "2024-02-17"
   },
@@ -108,7 +108,7 @@ const mockFlights = [
     arrival: "03:30 PM",
     duration: "2h 15m",
     stops: "Non-stop",
-    price: 189,
+    price: 15749,
     class: "Economy",
     date: "2024-02-15"
   },
@@ -122,14 +122,14 @@ const mockFlights = [
     arrival: "07:15 AM+1",
     duration: "8h 15m",
     stops: "Non-stop",
-    price: 679,
+    price: 56499,
     class: "Economy",
     date: "2024-02-16"
   }
 ]
 
 export default function FlightsPage() {
-  const [priceRange, setPriceRange] = useState([0, 1200])
+  const [priceRange, setPriceRange] = useState([0, 100000])
   const [sortBy, setSortBy] = useState<string>("recommended")
   const [filteredFlights] = useState(mockFlights)
 
@@ -161,14 +161,14 @@ export default function FlightsPage() {
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
-                      max={1200}
-                      step={50}
+                      max={100000}
+                      step={5000}
                       className="w-full"
                     />
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                    <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
+                    <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
@@ -284,7 +284,7 @@ export default function FlightsPage() {
             {/* Flight Cards */}
             <div className="space-y-4">
               {filteredFlights.map((flight) => (
-                <Card key={flight.id} className="hover:shadow-lg transition-shadow">
+                <Card key={flight.id} className="card-hover-effect">
                   <CardHeader>
                     <div className="flex items-center justify-between">
                       <div>
@@ -335,9 +335,9 @@ export default function FlightsPage() {
                   <CardFooter className="flex items-center justify-between border-t pt-4">
                     <div>
                       <p className="text-sm text-muted-foreground">Price per person</p>
-                      <span className="text-3xl font-bold">${flight.price}</span>
+                      <span className="text-3xl font-bold">₹{flight.price.toLocaleString('en-IN')}</span>
                     </div>
-                    <Button size="lg" asChild>
+                    <Button size="lg" asChild className="btn-primary-enhanced">
                       <Link href={`/flights/${flight.id}`}>Select Flight</Link>
                     </Button>
                   </CardFooter>
