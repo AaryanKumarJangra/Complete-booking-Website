@@ -10,7 +10,7 @@ import { Slider } from "@/components/ui/slider"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Car, Users, Briefcase, Wind, Navigation } from "lucide-react"
+import { Car, Users, Briefcase, Navigation } from "lucide-react"
 import Link from "next/link"
 
 const mockTaxis = [
@@ -20,8 +20,8 @@ const mockTaxis = [
     model: "Toyota Camry",
     capacity: 4,
     luggage: 2,
-    pricePerKm: 2.5,
-    estimatedPrice: 25,
+    pricePerKm: 18,
+    estimatedPrice: 180,
     estimatedTime: "15 min",
     features: ["AC", "GPS", "Music System"],
     rating: 4.8,
@@ -33,8 +33,8 @@ const mockTaxis = [
     model: "Honda CR-V",
     capacity: 6,
     luggage: 4,
-    pricePerKm: 3.5,
-    estimatedPrice: 35,
+    pricePerKm: 25,
+    estimatedPrice: 250,
     estimatedTime: "15 min",
     features: ["AC", "GPS", "Extra Luggage Space", "USB Charging"],
     rating: 4.9,
@@ -46,8 +46,8 @@ const mockTaxis = [
     model: "Mercedes S-Class",
     capacity: 4,
     luggage: 3,
-    pricePerKm: 5.5,
-    estimatedPrice: 55,
+    pricePerKm: 45,
+    estimatedPrice: 450,
     estimatedTime: "12 min",
     features: ["Premium AC", "GPS", "Leather Seats", "WiFi", "Bottled Water"],
     rating: 5.0,
@@ -59,8 +59,8 @@ const mockTaxis = [
     model: "Honda Civic",
     capacity: 4,
     luggage: 2,
-    pricePerKm: 1.8,
-    estimatedPrice: 18,
+    pricePerKm: 12,
+    estimatedPrice: 120,
     estimatedTime: "18 min",
     features: ["AC", "GPS"],
     rating: 4.5,
@@ -72,8 +72,8 @@ const mockTaxis = [
     model: "Toyota Hiace",
     capacity: 8,
     luggage: 6,
-    pricePerKm: 4.0,
-    estimatedPrice: 40,
+    pricePerKm: 30,
+    estimatedPrice: 300,
     estimatedTime: "20 min",
     features: ["AC", "GPS", "Extra Space", "USB Charging"],
     rating: 4.7,
@@ -85,8 +85,8 @@ const mockTaxis = [
     model: "BMW X5",
     capacity: 5,
     luggage: 4,
-    pricePerKm: 6.0,
-    estimatedPrice: 60,
+    pricePerKm: 50,
+    estimatedPrice: 500,
     estimatedTime: "10 min",
     features: ["Premium AC", "GPS", "Leather Seats", "WiFi", "Premium Sound"],
     rating: 4.9,
@@ -98,8 +98,8 @@ const mockTaxis = [
     model: "Toyota Yaris",
     capacity: 3,
     luggage: 1,
-    pricePerKm: 1.5,
-    estimatedPrice: 15,
+    pricePerKm: 10,
+    estimatedPrice: 100,
     estimatedTime: "20 min",
     features: ["AC", "GPS"],
     rating: 4.4,
@@ -111,8 +111,8 @@ const mockTaxis = [
     model: "Tesla Model 3",
     capacity: 4,
     luggage: 2,
-    pricePerKm: 3.0,
-    estimatedPrice: 30,
+    pricePerKm: 22,
+    estimatedPrice: 220,
     estimatedTime: "14 min",
     features: ["AC", "GPS", "Eco-Friendly", "Autopilot", "Premium Sound"],
     rating: 4.8,
@@ -121,7 +121,7 @@ const mockTaxis = [
 ]
 
 export default function TaxisPage() {
-  const [priceRange, setPriceRange] = useState([0, 70])
+  const [priceRange, setPriceRange] = useState([0, 600])
   const [sortBy, setSortBy] = useState<string>("recommended")
   const [filteredTaxis] = useState(mockTaxis)
 
@@ -153,14 +153,14 @@ export default function TaxisPage() {
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
-                      max={70}
-                      step={5}
+                      max={600}
+                      step={50}
                       className="w-full"
                     />
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                    <span>₹{priceRange[0]}</span>
+                    <span>₹{priceRange[1]}</span>
                   </div>
                 </div>
 
@@ -273,7 +273,7 @@ export default function TaxisPage() {
             {/* Taxi Cards */}
             <div className="grid gap-4 md:grid-cols-2">
               {filteredTaxis.map((taxi) => (
-                <Card key={taxi.id} className="hover:shadow-lg transition-shadow">
+                <Card key={taxi.id} className="card-hover-effect">
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div>
@@ -320,13 +320,13 @@ export default function TaxisPage() {
                     <div>
                       <p className="text-sm text-muted-foreground">Estimated fare</p>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-2xl font-bold">${taxi.estimatedPrice}</span>
+                        <span className="text-2xl font-bold">₹{taxi.estimatedPrice}</span>
                         <span className="text-xs text-muted-foreground">
-                          (${taxi.pricePerKm}/km)
+                          (₹{taxi.pricePerKm}/km)
                         </span>
                       </div>
                     </div>
-                    <Button asChild>
+                    <Button asChild className="btn-primary-enhanced">
                       <Link href={`/taxis/${taxi.id}`}>Book Now</Link>
                     </Button>
                   </CardFooter>
