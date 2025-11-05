@@ -17,6 +17,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Car, Users, Briefcase, MapPin, CalendarIcon, Clock, Phone, Mail } from "lucide-react"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { toast } from "sonner"
 
 const mockTaxiData: Record<string, any> = {
   "1": {
@@ -25,8 +26,8 @@ const mockTaxiData: Record<string, any> = {
     model: "Toyota Camry",
     capacity: 4,
     luggage: 2,
-    pricePerKm: 2.5,
-    estimatedPrice: 25,
+    pricePerKm: 18,
+    estimatedPrice: 180,
     estimatedTime: "15 min",
     features: ["AC", "GPS", "Music System", "Phone Charger"],
     rating: 4.8,
@@ -54,19 +55,19 @@ export default function TaxiDetailPage() {
 
   const [estimatedDistance] = useState(10) // Mock distance in km
   const subtotal = taxi.pricePerKm * estimatedDistance
-  const serviceFee = 5
+  const serviceFee = 50
   const total = subtotal + serviceFee
 
   const handleBooking = () => {
     if (!pickupLocation || !dropLocation || !pickupDate || !pickupTime || !fullName || !email || !phone) {
-      alert("Please fill in all required fields")
+      toast.error("Please fill in all required fields")
       return
     }
     setShowPayment(true)
   }
 
   const handlePayment = () => {
-    alert("Taxi booked successfully! Your driver will contact you shortly.")
+    toast.success("Taxi booked successfully! Your driver will contact you shortly.")
     router.push("/profile/bookings")
   }
 
@@ -76,7 +77,7 @@ export default function TaxiDetailPage() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Taxi Info */}
-        <Card className="mb-8">
+        <Card className="mb-8 card-hover-effect">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -120,7 +121,7 @@ export default function TaxiDetailPage() {
                 <Car className="h-5 w-5 text-muted-foreground" />
                 <div>
                   <p className="text-sm text-muted-foreground">Rate</p>
-                  <p className="font-medium">${taxi.pricePerKm}/km</p>
+                  <p className="font-medium">₹{taxi.pricePerKm}/km</p>
                 </div>
               </div>
             </div>
@@ -314,11 +315,11 @@ export default function TaxiDetailPage() {
               </CardContent>
               <CardFooter>
                 {!showPayment ? (
-                  <Button size="lg" className="w-full" onClick={handleBooking}>
+                  <Button size="lg" className="w-full btn-primary-enhanced" onClick={handleBooking}>
                     Proceed to Payment
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full" onClick={handlePayment}>
+                  <Button size="lg" className="w-full btn-primary-enhanced" onClick={handlePayment}>
                     Confirm Booking
                   </Button>
                 )}
@@ -340,19 +341,19 @@ export default function TaxiDetailPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      ${taxi.pricePerKm}/km × {estimatedDistance}km
+                      ₹{taxi.pricePerKm}/km × {estimatedDistance}km
                     </span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="font-medium">₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Service Fee</span>
-                    <span className="font-medium">${serviceFee.toFixed(2)}</span>
+                    <span className="font-medium">₹{serviceFee.toFixed(2)}</span>
                   </div>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Estimated Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toFixed(2)}</span>
                 </div>
                 <p className="text-xs text-muted-foreground">
                   *Final fare may vary based on actual distance and waiting time
