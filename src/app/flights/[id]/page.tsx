@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plane, Clock, Calendar as CalendarIcon, ArrowRight, Luggage, Users, Mail, Phone } from "lucide-react"
+import { toast } from "sonner"
 
 const mockFlightData: Record<string, any> = {
   "1": {
@@ -24,7 +24,7 @@ const mockFlightData: Record<string, any> = {
     arrival: "08:30 PM",
     duration: "7h 30m",
     stops: "Non-stop",
-    price: 599,
+    price: 49999,
     class: "Economy",
     date: "2024-02-15",
     aircraft: "Boeing 787-9",
@@ -59,14 +59,14 @@ export default function FlightDetailPage() {
   const handleBooking = () => {
     const allFilled = passengers.every(p => p.firstName && p.lastName && p.dateOfBirth && p.passportNumber)
     if (!allFilled || !contactEmail || !contactPhone) {
-      alert("Please fill in all required fields")
+      toast.error("Please fill in all required fields")
       return
     }
     setShowPayment(true)
   }
 
   const handlePayment = () => {
-    alert("Flight booked successfully! Check your email for ticket details.")
+    toast.success("Flight booked successfully! Check your email for ticket details.")
     router.push("/profile/bookings")
   }
 
@@ -80,7 +80,7 @@ export default function FlightDetailPage() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Flight Info */}
-        <Card className="mb-8">
+        <Card className="mb-8 card-hover-effect">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -277,11 +277,11 @@ export default function FlightDetailPage() {
               </CardContent>
               <CardFooter>
                 {!showPayment ? (
-                  <Button size="lg" className="w-full" onClick={handleBooking}>
+                  <Button size="lg" className="w-full btn-primary-enhanced" onClick={handleBooking}>
                     Proceed to Payment
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full" onClick={handlePayment}>
+                  <Button size="lg" className="w-full btn-primary-enhanced" onClick={handlePayment}>
                     Confirm Booking
                   </Button>
                 )}
@@ -303,19 +303,19 @@ export default function FlightDetailPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      ${flight.price} × {passengers.length} passenger{passengers.length !== 1 ? "s" : ""}
+                      ₹{flight.price.toLocaleString('en-IN')} × {passengers.length} passenger{passengers.length !== 1 ? "s" : ""}
                     </span>
-                    <span className="font-medium">${subtotal}</span>
+                    <span className="font-medium">₹{subtotal.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Taxes & Fees</span>
-                    <span className="font-medium">${taxes.toFixed(2)}</span>
+                    <span className="font-medium">₹{taxes.toFixed(2)}</span>
                   </div>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 </div>
               </CardContent>
             </Card>
