@@ -31,7 +31,7 @@ interface Hotel {
 }
 
 export default function HotelsPage() {
-  const [priceRange, setPriceRange] = useState([0, 500])
+  const [priceRange, setPriceRange] = useState([0, 50000])
   const [selectedRating, setSelectedRating] = useState<string>("all")
   const [sortBy, setSortBy] = useState<string>("recommended")
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([])
@@ -112,7 +112,7 @@ export default function HotelsPage() {
   }
 
   const handleResetFilters = () => {
-    setPriceRange([0, 500])
+    setPriceRange([0, 50000])
     setSelectedRating("all")
     setSortBy("recommended")
     setSelectedAmenities([])
@@ -152,14 +152,14 @@ export default function HotelsPage() {
                     <Slider
                       value={priceRange}
                       onValueChange={setPriceRange}
-                      max={500}
-                      step={10}
+                      max={50000}
+                      step={1000}
                       className="w-full"
                     />
                   </div>
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>${priceRange[0]}</span>
-                    <span>${priceRange[1]}</span>
+                    <span>₹{priceRange[0].toLocaleString('en-IN')}</span>
+                    <span>₹{priceRange[1].toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 
@@ -274,7 +274,7 @@ export default function HotelsPage() {
             {!isLoading && !error && filteredHotels.length > 0 && (
               <div className="space-y-4">
                 {filteredHotels.map((hotel) => (
-                  <Card key={hotel.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <Card key={hotel.id} className="overflow-hidden card-hover-effect">
                     <div className="grid md:grid-cols-[300px_1fr] gap-0">
                       <div className="relative h-64 md:h-full">
                         <Image
@@ -318,11 +318,11 @@ export default function HotelsPage() {
                           <div>
                             <p className="text-sm text-muted-foreground">Starting from</p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-3xl font-bold">${hotel.price}</span>
+                              <span className="text-3xl font-bold">₹{hotel.price.toLocaleString('en-IN')}</span>
                               <span className="text-muted-foreground text-sm">/night</span>
                             </div>
                           </div>
-                          <Button size="lg" asChild>
+                          <Button size="lg" asChild className="btn-primary-enhanced">
                             <Link href={`/hotels/${hotel.id}`}>View Details</Link>
                           </Button>
                         </CardFooter>
