@@ -189,7 +189,7 @@ export default function HotelDetailPage() {
           {/* Image Gallery */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {hotel.images.map((image: string, index: number) => (
-              <div key={index} className="relative h-64 rounded-lg overflow-hidden">
+              <div key={index} className="relative h-64 rounded-lg overflow-hidden card-hover-effect">
                 <Image src={image} alt={`${hotel.name} ${index + 1}`} fill className="object-cover" />
               </div>
             ))}
@@ -371,13 +371,13 @@ export default function HotelDetailPage() {
               </CardContent>
               <CardFooter>
                 {!showPayment ? (
-                  <Button size="lg" className="w-full" onClick={handleBooking}>
+                  <Button size="lg" className="w-full btn-primary-enhanced" onClick={handleBooking}>
                     Proceed to Payment
                   </Button>
                 ) : (
                   <Button 
                     size="lg" 
-                    className="w-full" 
+                    className="w-full btn-primary-enhanced" 
                     onClick={handlePayment}
                     disabled={isBooking}
                   >
@@ -409,19 +409,19 @@ export default function HotelDetailPage() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">
-                      ${hotel.price} × {nights} night{nights !== 1 ? "s" : ""}
+                      ₹{hotel.price.toLocaleString('en-IN')} × {nights} night{nights !== 1 ? "s" : ""}
                     </span>
-                    <span className="font-medium">${subtotal}</span>
+                    <span className="font-medium">₹{subtotal.toLocaleString('en-IN')}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Taxes & Fees</span>
-                    <span className="font-medium">${taxes.toFixed(2)}</span>
+                    <span className="font-medium">₹{taxes.toFixed(2)}</span>
                   </div>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${total.toFixed(2)}</span>
+                  <span>₹{total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
                 </div>
               </CardContent>
             </Card>
