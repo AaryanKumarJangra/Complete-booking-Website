@@ -15,6 +15,13 @@
       "when": 1764787105831,
       "tag": "0001_outstanding_triton",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1764787287038,
+      "tag": "0002_old_giant_man",
+      "breakpoints": true
     }
   ]
 }
