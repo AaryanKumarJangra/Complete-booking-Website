@@ -139,9 +139,9 @@ export default function HotelsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Filters Sidebar */}
           <aside className="lg:col-span-1">
-            <Card>
-              <CardHeader>
-                <CardTitle>Filters</CardTitle>
+            <Card className="card-premium shadow-xl sticky top-24">
+              <CardHeader className="border-b">
+                <CardTitle className="gradient-text">Filters</CardTitle>
                 <CardDescription>Refine your search</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
@@ -220,7 +220,7 @@ export default function HotelsPage() {
                   </div>
                 </div>
 
-                <Button className="w-full" variant="outline" onClick={handleResetFilters}>
+                <Button className="w-full btn-primary-enhanced shadow-lg" variant="outline" onClick={handleResetFilters}>
                   Reset Filters
                 </Button>
               </CardContent>
@@ -250,13 +250,16 @@ export default function HotelsPage() {
             {/* Loading State */}
             {isLoading && (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                <div className="text-center space-y-4">
+                  <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+                  <p className="text-muted-foreground animate-pulse">Loading hotels...</p>
+                </div>
               </div>
             )}
 
             {/* Error State */}
             {error && !isLoading && (
-              <Card className="p-8 text-center">
+              <Card className="p-8 text-center shadow-lg">
                 <p className="text-muted-foreground mb-4">{error}</p>
                 <Button onClick={fetchHotels}>Try Again</Button>
               </Card>
@@ -264,7 +267,7 @@ export default function HotelsPage() {
 
             {/* Empty State */}
             {!isLoading && !error && filteredHotels.length === 0 && (
-              <Card className="p-8 text-center">
+              <Card className="p-8 text-center shadow-lg">
                 <p className="text-muted-foreground mb-4">No hotels found matching your criteria</p>
                 <Button variant="outline" onClick={handleResetFilters}>Reset Filters</Button>
               </Card>
@@ -274,27 +277,28 @@ export default function HotelsPage() {
             {!isLoading && !error && filteredHotels.length > 0 && (
               <div className="space-y-4">
                 {filteredHotels.map((hotel) => (
-                  <Card key={hotel.id} className="overflow-hidden card-hover-effect">
+                  <Card key={hotel.id} className="overflow-hidden card-hover-effect shadow-xl card-premium">
                     <div className="grid md:grid-cols-[300px_1fr] gap-0">
-                      <div className="relative h-64 md:h-full">
+                      <div className="relative h-64 md:h-full overflow-hidden">
                         <Image
                           src={hotel.images[0] || "/placeholder.jpg"}
                           alt={hotel.name}
                           fill
-                          className="object-cover"
+                          className="object-cover transition-transform duration-500 hover:scale-110"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
                       </div>
                       <div className="flex flex-col">
                         <CardHeader>
                           <div className="flex items-start justify-between">
                             <div>
-                              <CardTitle className="text-xl mb-2">{hotel.name}</CardTitle>
-                              <CardDescription className="flex items-center gap-1">
+                              <CardTitle className="text-xl mb-2 hover:text-primary transition-colors">{hotel.name}</CardTitle>
+                              <CardDescription className="flex items-center gap-1 transition-colors hover:text-foreground">
                                 <MapPin className="h-4 w-4" />
                                 {hotel.location}
                               </CardDescription>
                             </div>
-                            <Badge variant="secondary" className="flex items-center gap-1">
+                            <Badge variant="secondary" className="flex items-center gap-1 hover:scale-105 transition-transform">
                               <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                               {hotel.rating}
                             </Badge>
@@ -307,22 +311,22 @@ export default function HotelsPage() {
                             </p>
                             <div className="flex flex-wrap gap-2">
                               {hotel.amenities.slice(0, 4).map((amenity) => (
-                                <Badge key={amenity} variant="outline" className="text-xs">
+                                <Badge key={amenity} variant="outline" className="text-xs hover:bg-primary hover:text-primary-foreground transition-colors">
                                   {amenity}
                                 </Badge>
                               ))}
                             </div>
                           </div>
                         </CardContent>
-                        <CardFooter className="flex items-center justify-between border-t pt-4">
+                        <CardFooter className="flex items-center justify-between border-t pt-4 bg-gradient-to-r from-muted/20 to-transparent">
                           <div>
                             <p className="text-sm text-muted-foreground">Starting from</p>
                             <div className="flex items-baseline gap-1">
-                              <span className="text-3xl font-bold">₹{hotel.price.toLocaleString('en-IN')}</span>
+                              <span className="text-3xl font-bold gradient-text">₹{hotel.price.toLocaleString('en-IN')}</span>
                               <span className="text-muted-foreground text-sm">/night</span>
                             </div>
                           </div>
-                          <Button size="lg" asChild className="btn-primary-enhanced">
+                          <Button size="lg" asChild className="btn-primary-enhanced shadow-lg hover:shadow-xl transition-shadow">
                             <Link href={`/hotels/${hotel.id}`}>View Details</Link>
                           </Button>
                         </CardFooter>
