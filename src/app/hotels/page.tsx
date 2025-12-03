@@ -125,12 +125,12 @@ export default function HotelsPage() {
     : hotels
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Hotels in Your Destination</h1>
+          <h1 className="text-3xl font-bold mb-2 gradient-text text-shadow-soft">Hotels in Your Destination</h1>
           <p className="text-muted-foreground">
             {filteredHotels.length} properties found
           </p>
