@@ -21,7 +21,7 @@ interface Taxi {
   capacity: number
   luggage: number
   pricePerKm: number
-  features: string[]
+  features: string[] | string
   rating: number
   totalTrips: number
   available: boolean
@@ -71,8 +71,14 @@ export default function TaxisPage() {
       
       const data = await response.json()
       
+      // Parse features if they're strings
+      const parsedData = data.map((taxi: Taxi) => ({
+        ...taxi,
+        features: typeof taxi.features === 'string' ? JSON.parse(taxi.features) : taxi.features
+      }))
+      
       // Client-side filtering for types
-      let filtered = data
+      let filtered = parsedData
       
       if (selectedTypes.length > 0) {
         filtered = filtered.filter((taxi: Taxi) => selectedTypes.includes(taxi.type))
@@ -105,6 +111,16 @@ export default function TaxisPage() {
   // Calculate estimated price for 10km trip
   const getEstimatedPrice = (pricePerKm: number) => {
     return pricePerKm * 10
+  }
+
+  // Helper to get features array
+  const getFeatures = (features: string[] | string): string[] => {
+    if (Array.isArray(features)) return features
+    try {
+      return JSON.parse(features)
+    } catch {
+      return []
+    }
   }
 
   return (
@@ -272,67 +288,70 @@ export default function TaxisPage() {
             {/* Taxi Cards */}
             {!isLoading && !error && taxis.length > 0 && (
               <div className="grid gap-4 md:grid-cols-2">
-                {taxis.map((taxi) => (
-                  <Card key={taxi.id} className="card-hover-effect">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <CardTitle className="flex items-center gap-2">
-                            <Car className="h-5 w-5" />
-                            {taxi.type}
-                          </CardTitle>
-                          <CardDescription>{taxi.model}</CardDescription>
-                        </div>
-                        <Badge variant="secondary" className="flex items-center gap-1">
-                          ⭐ {taxi.rating.toFixed(1)}
-                        </Badge>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Users className="h-4 w-4" />
-                          <span>{taxi.capacity} seats</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Briefcase className="h-4 w-4" />
-                          <span>{taxi.luggage} bags</span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        {taxi.features.slice(0, 4).map((feature) => (
-                          <Badge key={feature} variant="outline" className="text-xs">
-                            {feature}
+                {taxis.map((taxi) => {
+                  const features = getFeatures(taxi.features)
+                  return (
+                    <Card key={taxi.id} className="card-hover-effect">
+                      <CardHeader>
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <CardTitle className="flex items-center gap-2">
+                              <Car className="h-5 w-5" />
+                              {taxi.type}
+                            </CardTitle>
+                            <CardDescription>{taxi.model}</CardDescription>
+                          </div>
+                          <Badge variant="secondary" className="flex items-center gap-1">
+                            ⭐ {taxi.rating.toFixed(1)}
                           </Badge>
-                        ))}
-                      </div>
-                      
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-muted-foreground">
-                          {taxi.totalTrips} completed trips
-                        </span>
-                        <Badge variant={taxi.available ? "default" : "secondary"}>
-                          {taxi.available ? "Available" : "Busy"}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                    <CardFooter className="flex items-center justify-between border-t pt-4">
-                      <div>
-                        <p className="text-sm text-muted-foreground">Estimated fare (10km)</p>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-2xl font-bold">₹{getEstimatedPrice(taxi.pricePerKm)}</span>
-                          <span className="text-xs text-muted-foreground">
-                            (₹{taxi.pricePerKm}/km)
-                          </span>
                         </div>
-                      </div>
-                      <Button asChild className="btn-primary-enhanced" disabled={!taxi.available}>
-                        <Link href={`/taxis/${taxi.id}`}>Book Now</Link>
-                      </Button>
-                    </CardFooter>
-                  </Card>
-                ))}
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-2 text-sm">
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Users className="h-4 w-4" />
+                            <span>{taxi.capacity} seats</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-muted-foreground">
+                            <Briefcase className="h-4 w-4" />
+                            <span>{taxi.luggage} bags</span>
+                          </div>
+                        </div>
+                        
+                        <div className="flex flex-wrap gap-2">
+                          {features.slice(0, 4).map((feature, index) => (
+                            <Badge key={`${taxi.id}-${feature}-${index}`} variant="outline" className="text-xs">
+                              {feature}
+                            </Badge>
+                          ))}
+                        </div>
+                        
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">
+                            {taxi.totalTrips} completed trips
+                          </span>
+                          <Badge variant={taxi.available ? "default" : "secondary"}>
+                            {taxi.available ? "Available" : "Busy"}
+                          </Badge>
+                        </div>
+                      </CardContent>
+                      <CardFooter className="flex items-center justify-between border-t pt-4">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Estimated fare (10km)</p>
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-2xl font-bold">₹{getEstimatedPrice(taxi.pricePerKm)}</span>
+                            <span className="text-xs text-muted-foreground">
+                              (₹{taxi.pricePerKm}/km)
+                            </span>
+                          </div>
+                        </div>
+                        <Button asChild className="btn-primary-enhanced" disabled={!taxi.available}>
+                          <Link href={`/taxis/${taxi.id}`}>Book Now</Link>
+                        </Button>
+                      </CardFooter>
+                    </Card>
+                  )
+                })}
               </div>
             )}
           </div>
