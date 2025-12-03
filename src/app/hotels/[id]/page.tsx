@@ -152,7 +152,10 @@ export default function HotelDetailPage() {
       <div className="min-h-screen flex flex-col">
         <Navbar />
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="h-12 w-12 animate-spin text-primary" />
+          <div className="text-center space-y-4">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto" />
+            <div className="h-4 w-32 skeleton rounded mx-auto"></div>
+          </div>
         </div>
         <Footer />
       </div>
@@ -164,21 +167,21 @@ export default function HotelDetailPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
       <Navbar />
 
       <div className="container mx-auto px-4 py-8">
         {/* Hotel Info */}
         <div className="mb-8">
           <div className="flex items-start justify-between mb-4">
-            <div>
-              <h1 className="text-4xl font-bold mb-2">{hotel.name}</h1>
+            <div className="space-y-2">
+              <h1 className="text-4xl md:text-5xl font-bold gradient-text text-shadow-soft">{hotel.name}</h1>
               <div className="flex items-center gap-4 text-muted-foreground">
-                <span className="flex items-center gap-1">
+                <span className="flex items-center gap-1 transition-colors hover:text-foreground">
                   <MapPin className="h-4 w-4" />
                   {hotel.address}
                 </span>
-                <Badge variant="secondary" className="flex items-center gap-1">
+                <Badge variant="secondary" className="flex items-center gap-1 hover:scale-105 transition-transform">
                   <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
                   {hotel.rating} ({hotel.reviews} reviews)
                 </Badge>
@@ -186,29 +189,32 @@ export default function HotelDetailPage() {
             </div>
           </div>
 
-          {/* Image Gallery */}
+          {/* Image Gallery with enhanced effects */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
             {hotel.images.map((image: string, index: number) => (
-              <div key={index} className="relative h-64 rounded-lg overflow-hidden card-hover-effect">
-                <Image src={image} alt={`${hotel.name} ${index + 1}`} fill className="object-cover" />
+              <div key={index} className="relative h-64 rounded-lg overflow-hidden card-hover-effect shadow-lg">
+                <Image src={image} alt={`${hotel.name} ${index + 1}`} fill className="object-cover transition-transform duration-500 hover:scale-110" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300"></div>
               </div>
             ))}
           </div>
 
-          {/* Description */}
-          <Card className="mb-8">
+          {/* Description with premium card effect */}
+          <Card className="mb-8 card-premium shadow-lg">
             <CardHeader>
-              <CardTitle>About this property</CardTitle>
+              <CardTitle className="text-2xl">About this property</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground mb-6">{hotel.description}</p>
+              <p className="text-muted-foreground mb-6 leading-relaxed">{hotel.description}</p>
               
               <div>
-                <h3 className="font-semibold mb-3">Amenities</h3>
+                <h3 className="font-semibold mb-3 text-lg">Amenities</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                   {hotel.amenities.map((amenity: string) => (
                     <div key={amenity} className="flex items-center gap-2">
-                      <Badge variant="outline">{amenity}</Badge>
+                      <Badge variant="outline" className="hover:bg-primary hover:text-primary-foreground transition-colors cursor-default">
+                        {amenity}
+                      </Badge>
                     </div>
                   ))}
                 </div>
@@ -220,22 +226,22 @@ export default function HotelDetailPage() {
         {/* Booking Form */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Reservation Details</CardTitle>
+            <Card className="card-premium shadow-xl">
+              <CardHeader className="border-b">
+                <CardTitle className="text-2xl gradient-text">Reservation Details</CardTitle>
                 <CardDescription>Fill in your booking information</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-6">
                 {/* Dates and Guests */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2">
-                    <Label>Check In</Label>
+                    <Label className="font-semibold">Check In</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-full justify-start text-left font-normal hover:border-primary transition-all",
                             !checkIn && "text-muted-foreground"
                           )}
                         >
@@ -250,13 +256,13 @@ export default function HotelDetailPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Check Out</Label>
+                    <Label className="font-semibold">Check Out</Label>
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
                           className={cn(
-                            "w-full justify-start text-left font-normal",
+                            "w-full justify-start text-left font-normal hover:border-primary transition-all",
                             !checkOut && "text-muted-foreground"
                           )}
                         >
@@ -271,7 +277,7 @@ export default function HotelDetailPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="guests">Guests</Label>
+                    <Label htmlFor="guests" className="font-semibold">Guests</Label>
                     <div className="relative">
                       <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
@@ -280,7 +286,7 @@ export default function HotelDetailPage() {
                         min="1"
                         value={guests}
                         onChange={(e) => setGuests(e.target.value)}
-                        className="pl-9"
+                        className="pl-9 hover:border-primary focus:border-primary transition-colors"
                       />
                     </div>
                   </div>
@@ -290,21 +296,22 @@ export default function HotelDetailPage() {
 
                 {/* Guest Information */}
                 <div className="space-y-4">
-                  <h3 className="font-semibold">Guest Information</h3>
+                  <h3 className="font-semibold text-lg">Guest Information</h3>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Label htmlFor="fullName" className="font-semibold">Full Name *</Label>
                     <Input
                       id="fullName"
                       placeholder="John Doe"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
+                      className="hover:border-primary focus:border-primary transition-colors"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email *</Label>
+                      <Label htmlFor="email" className="font-semibold">Email *</Label>
                       <div className="relative">
                         <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -313,13 +320,13 @@ export default function HotelDetailPage() {
                           placeholder="john@example.com"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          className="pl-9"
+                          className="pl-9 hover:border-primary focus:border-primary transition-colors"
                         />
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone" className="font-semibold">Phone Number *</Label>
                       <div className="relative">
                         <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                         <Input
@@ -328,20 +335,21 @@ export default function HotelDetailPage() {
                           placeholder="+1 (555) 000-0000"
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
-                          className="pl-9"
+                          className="pl-9 hover:border-primary focus:border-primary transition-colors"
                         />
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="requests">Special Requests (Optional)</Label>
+                    <Label htmlFor="requests" className="font-semibold">Special Requests (Optional)</Label>
                     <Textarea
                       id="requests"
                       placeholder="Any special requirements or requests..."
                       value={specialRequests}
                       onChange={(e) => setSpecialRequests(e.target.value)}
                       rows={4}
+                      className="hover:border-primary focus:border-primary transition-colors resize-none"
                     />
                   </div>
                 </div>
@@ -349,35 +357,38 @@ export default function HotelDetailPage() {
                 {showPayment && (
                   <>
                     <Separator />
-                    <div className="space-y-4">
-                      <h3 className="font-semibold">Payment Information</h3>
+                    <div className="space-y-4 p-4 rounded-lg glass-effect">
+                      <h3 className="font-semibold text-lg flex items-center gap-2">
+                        <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
+                        Payment Information
+                      </h3>
                       <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Card Number</Label>
-                        <Input id="cardNumber" placeholder="1234 5678 9012 3456" />
+                        <Label htmlFor="cardNumber" className="font-semibold">Card Number</Label>
+                        <Input id="cardNumber" placeholder="1234 5678 9012 3456" className="hover:border-primary focus:border-primary transition-colors" />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="expiry">Expiry Date</Label>
-                          <Input id="expiry" placeholder="MM/YY" />
+                          <Label htmlFor="expiry" className="font-semibold">Expiry Date</Label>
+                          <Input id="expiry" placeholder="MM/YY" className="hover:border-primary focus:border-primary transition-colors" />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="cvv">CVV</Label>
-                          <Input id="cvv" placeholder="123" />
+                          <Label htmlFor="cvv" className="font-semibold">CVV</Label>
+                          <Input id="cvv" placeholder="123" className="hover:border-primary focus:border-primary transition-colors" />
                         </div>
                       </div>
                     </div>
                   </>
                 )}
               </CardContent>
-              <CardFooter>
+              <CardFooter className="border-t pt-6">
                 {!showPayment ? (
-                  <Button size="lg" className="w-full btn-primary-enhanced" onClick={handleBooking}>
+                  <Button size="lg" className="w-full btn-primary-enhanced text-lg h-12 shadow-lg hover:shadow-xl transition-shadow" onClick={handleBooking}>
                     Proceed to Payment
                   </Button>
                 ) : (
                   <Button 
                     size="lg" 
-                    className="w-full btn-primary-enhanced" 
+                    className="w-full btn-primary-enhanced text-lg h-12 shadow-lg hover:shadow-xl transition-shadow" 
                     onClick={handlePayment}
                     disabled={isBooking}
                   >
@@ -395,33 +406,36 @@ export default function HotelDetailPage() {
             </Card>
           </div>
 
-          {/* Price Summary */}
+          {/* Price Summary with enhanced styling */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardHeader>
-                <CardTitle>Price Summary</CardTitle>
+            <Card className="sticky top-24 card-premium shadow-xl border-2">
+              <CardHeader className="border-b bg-gradient-to-r from-primary/5 to-primary/10">
+                <CardTitle className="text-2xl gradient-text">Price Summary</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <div className="flex justify-between">
+              <CardContent className="space-y-4 pt-6">
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center p-2 rounded hover:bg-muted/50 transition-colors">
                     <span className="text-muted-foreground">Room Type</span>
-                    <span className="font-medium">{hotel.roomType}</span>
+                    <Badge variant="secondary" className="font-medium">{hotel.roomType}</Badge>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center p-2 rounded hover:bg-muted/50 transition-colors">
                     <span className="text-muted-foreground">
                       ₹{hotel.price.toLocaleString('en-IN')} × {nights} night{nights !== 1 ? "s" : ""}
                     </span>
                     <span className="font-medium">₹{subtotal.toLocaleString('en-IN')}</span>
                   </div>
-                  <div className="flex justify-between">
+                  <div className="flex justify-between items-center p-2 rounded hover:bg-muted/50 transition-colors">
                     <span className="text-muted-foreground">Taxes & Fees</span>
                     <span className="font-medium">₹{taxes.toFixed(2)}</span>
                   </div>
                 </div>
                 <Separator />
-                <div className="flex justify-between text-lg font-bold">
+                <div className="flex justify-between text-lg font-bold p-3 rounded-lg bg-gradient-to-r from-primary/10 to-primary/5">
                   <span>Total</span>
-                  <span>₹{total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                  <span className="gradient-text text-2xl">₹{total.toLocaleString('en-IN', { maximumFractionDigits: 2 })}</span>
+                </div>
+                <div className="text-xs text-muted-foreground text-center pt-2">
+                  🔒 Secure payment • Cancel anytime
                 </div>
               </CardContent>
             </Card>
