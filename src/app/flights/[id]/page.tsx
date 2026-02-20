@@ -1,5 +1,4 @@
 "use client"
-// importScripts ;
 import { useState } from "react"
 import { useParams, useRouter } from "next/navigation"
 import Navbar from "@/components/Navbar"
